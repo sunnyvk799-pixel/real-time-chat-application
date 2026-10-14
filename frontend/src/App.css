@@ -1,0 +1,112 @@
+/* Application-wide layout */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Shared buttons */
+button {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Shared form controls */
+input,
+textarea {
+  background: #0c1424;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(124 131 255 / 12%);
+  outline: none;
+}
+
+/* Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #35415a transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #35415a;
+  border-radius: 20px;
+}
+
+/* Selection */
+::selection {
+  color: white;
+  background: rgb(124 131 255 / 40%);
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+/* Make typed text clearly visible */
+input,
+textarea {
+  color: #f8fafc;
+  caret-color: #a5b4fc;
+}
+
+/* Improve placeholder visibility */
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+/* Highlight selected text */
+input::selection,
+textarea::selection {
+  color: #ffffff;
+  background: #4f46e5;
+}
+
+/* Keep browser autofill readable */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f8fafc;
+  caret-color: #a5b4fc;
+  -webkit-box-shadow: 0 0 0 1000px #0c1424 inset;
+  border: 1px solid #7c83ff;
+  transition: background-color 9999s ease-out;
+}
+
+/* Make focused fields stand out */
+input:focus,
+textarea:focus {
+  color: #ffffff;
+  border-color: #9298ff;
+  box-shadow: 0 0 0 3px rgb(124 131 255 / 22%);
+  outline: none;
+}

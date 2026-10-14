@@ -1,9 +1,32 @@
-# Python virtual environment
+# Python virtual environments
 backend/.venv/
+.venv/
+venv/
 
 # Environment variables / secrets
+.env
+.env.*
+!.env.example
 backend/.env
+frontend/.env
+frontend/.env.*
 
-# Python cache
+# Python cache and test artifacts
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/dist/
+
+# Logs
+*.log
+
+# Local editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, pool
 from dotenv import load_dotenv
 
 from database import Base
-from models import User
+from models import User, Conversation, ConversationParticipant, Message
 
 
 load_dotenv()
