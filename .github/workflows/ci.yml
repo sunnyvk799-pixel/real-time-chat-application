@@ -26,9 +26,10 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    env:
+        env:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/chat_app_dev
       TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/chat_app_test
+      JWT_SECRET_KEY: ci-only-test-secret-not-for-production-123456789
 
     defaults:
       run:
