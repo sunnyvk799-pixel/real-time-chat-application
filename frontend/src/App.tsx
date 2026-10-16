@@ -1,7 +1,7 @@
 
 import { useState } from "react"
-import Login from "./pages/Login"
-import Chat from "./pages/Chat"
+import Login from "./pages/login";
+import Chat from "./pages/chat";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(

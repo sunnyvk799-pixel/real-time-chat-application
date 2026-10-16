@@ -1,6 +1,6 @@
 
 import "../chat.css";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 
 // ==================================================
 
@@ -45,11 +45,8 @@ type Message = {
 };
 
 type Presence = {
-
   status: "online" | "offline";
-
   last_seen?: string;
-
 };
 
 const statusRank: Record<MessageStatus, number> = {
@@ -375,81 +372,73 @@ function Chat({ onLogout }: ChatProps) {
     };
 
     ws.onmessage = (event: MessageEvent<string>) => {
-
-      let data: any;
+      let parsed: unknown;
 
       try {
-
-        data = JSON.parse(event.data);
-
+        parsed = JSON.parse(event.data);
       } catch {
-
         console.error("Invalid WebSocket JSON");
-
         return;
-
       }
 
-      // Presence event
+      if (
+        typeof parsed !== "object" ||
+        parsed === null ||
+        Array.isArray(parsed)
+      ) {
+        console.error("Invalid WebSocket message format");
+        return;
+      }
 
+      const data = parsed as Record<string, unknown>;
+
+      // Presence event
       if (data.type === "presence") {
+        const username = data.username;
+        const status = data.status;
+
+        if (
+          typeof username !== "string" ||
+          (status !== "online" && status !== "offline")
+        ) {
+          return;
+        }
+
+        const presence: Presence = {
+          status,
+          last_seen:
+            typeof data.last_seen === "string"
+              ? data.last_seen
+              : undefined,
+        };
 
         setPresence((previous) => ({
-
           ...previous,
-
-          [data.username]: {
-
-            status: data.status,
-
-            last_seen: data.last_seen ?? undefined,
-
-          },
-
+          [username]: presence,
         }));
 
         return;
-
       }
 
       // Message status event
-
       if (data.type === "message_status") {
-
         const conversationId = Number(data.conversation_id);
-
         const messageId = Number(data.message_id);
+        const status = data.status;
 
         if (
-
           !Number.isInteger(conversationId) ||
-
           !Number.isInteger(messageId) ||
-
           messageId <= 0
-
         ) {
-
           return;
-
         }
 
-        if (data.status === "received" || data.status === "read") {
-
-          updateOutgoingStatuses(
-
-            conversationId,
-
-            messageId,
-
-            data.status as MessageStatus
-
-          );
-
+        if (status === "received" || status === "read") {
+          updateOutgoingStatuses(conversationId, messageId, status);
         }
 
         return;
-
       }
 
       // Normal chat message
@@ -484,7 +473,10 @@ function Chat({ onLogout }: ChatProps) {
 
         content: data.content,
 
-        created_at: data.created_at,
+        created_at:
+          typeof data.created_at === "string"
+            ? data.created_at
+            : undefined,
 
         status: data.sender === currentUsername ? "sent" : undefined,
 
@@ -674,10 +666,12 @@ function Chat({ onLogout }: ChatProps) {
 
     };
 
+    
     ws.onclose = () => {
       console.log("WebSocket disconnected");
-      if (!shouldReconnect)
-        return;
+
+      if (!shouldReconnect) return;
+
       reconnectTimer = setTimeout(() => {
         reconnectTimer = null;
         connect();
@@ -686,7 +680,7 @@ function Chat({ onLogout }: ChatProps) {
       // Back off after repeated failures, up to 10 seconds.
       retryDelay = Math.min(retryDelay * 2, 10000);
     };
-    };
+    }; // Close connect function
 
     connect();
 
@@ -698,18 +692,13 @@ function Chat({ onLogout }: ChatProps) {
       if (activeSocket) activeSocket.close();
       websocket.current = null;
     };
-
   }, [
-
     token,
-
     currentUsername,
-
     sendSocketEvent,
-
     updateOutgoingStatuses,
-
   ]);
+
 
   // ==================================================
 
@@ -717,25 +706,26 @@ function Chat({ onLogout }: ChatProps) {
 
   // ==================================================
 
-  useEffect(() => {
+ useEffect(() => {
+  const username = selectedChat?.username;
 
-    if (!token || !selectedChat) return;
+  if (!token || !username) return;
 
-    const username = selectedChat.username;
+  const presenceUsername: string = username;
+  let cancelled = false;
 
-    let cancelled = false;
+  async function fetchPresence(): Promise<void> {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/users/${encodeURIComponent(presenceUsername)}/presence`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    async function fetchPresence(): Promise<void> {
-
-      try {
-
-        const response = await fetch(
-
-          `http://localhost:8080/users/${encodeURIComponent(username)}/presence`,
-
-          { headers: { Authorization: `Bearer ${token}` } }
-
-        );
+      // Keep the rest of your existing fetchPresence logic here.
 
         if (!response.ok) {
 
@@ -951,13 +941,13 @@ function Chat({ onLogout }: ChatProps) {
 
   // ==================================================
 
-  const selectedMessages: Message[] =
-
+  const selectedMessages: Message[] = useMemo(
+  () =>
     selectedConversationId !== null
-
       ? messages[selectedConversationId] ?? []
-
-      : [];
+      : [],
+  [selectedConversationId, messages]
+);
 
   // ==================================================
 

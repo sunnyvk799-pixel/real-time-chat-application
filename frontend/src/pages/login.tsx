@@ -29,7 +29,6 @@ function Login({ onLogin }: LoginProps) {
       )
 
       const data = await response.json()
-"http://localhost:8080/login"
       if (!response.ok) {
         console.log("Login failed:", data.detail)
         return
