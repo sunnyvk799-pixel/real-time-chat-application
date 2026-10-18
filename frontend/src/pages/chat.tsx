@@ -1,7 +1,7 @@
 
 import "../chat.css";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
-
+import { getWebSocketUrl } from "../api"
 // ==================================================
 
 // Types
@@ -259,7 +259,7 @@ function Chat({ onLogout }: ChatProps) {
 
       try {
 
-        const response = await fetch("http://localhost:8080/me", {
+        const response = await fetch("/me", {
 
           headers: { Authorization: `Bearer ${token}` },
 
@@ -311,7 +311,7 @@ function Chat({ onLogout }: ChatProps) {
 
         const response = await fetch(
 
-          "http://localhost:8080/conversations",
+          "/conversations",
 
           { headers: { Authorization: `Bearer ${token}` } }
 
@@ -362,7 +362,7 @@ function Chat({ onLogout }: ChatProps) {
     const connect = (): void => {
 
       const ws = new WebSocket(
-  `ws://localhost:8080/ws?token=${encodeURIComponent(token)}`
+        getWebSocketUrl(token)
       );
       websocket.current = ws;
 
