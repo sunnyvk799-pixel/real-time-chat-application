@@ -86,6 +86,7 @@ app.add_middleware(
     CORSMiddleware,
    allow_origins=[
     "http://localhost:5173",
+     "https://real-time-chat-application-frontend-d532.onrender.com",
 ],
     allow_credentials=True,
     allow_methods=["*"],
