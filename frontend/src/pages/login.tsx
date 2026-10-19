@@ -1,5 +1,6 @@
 
 import { useState } from "react"
+import { API_BASE_URL } from "../api"
 
 type LoginProps = {
   onLogin: () => void
@@ -27,7 +28,7 @@ function Login({ onLogin }: LoginProps) {
     setLoading(true)
 
     try {
-      const response = await fetch("/login", {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

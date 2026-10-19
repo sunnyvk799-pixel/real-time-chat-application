@@ -1,5 +1,6 @@
 
 import { useState } from "react"
+import { API_BASE_URL } from "../api"
 
 type RegisterProps = {
   onRegistered: () => void
@@ -30,7 +31,7 @@ function Register({ onRegistered }: RegisterProps) {
     setLoading(true)
 
     try {
-      const response = await fetch("/register", {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
